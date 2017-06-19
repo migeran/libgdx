@@ -16,6 +16,7 @@
 
 package com.badlogic.gdx.backends.iosmoe;
 
+import apple.uikit.UIView;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
@@ -97,6 +98,11 @@ public class IOSGraphics extends NSObject implements Graphics, GLKViewDelegate, 
 		super(peer);
 	}
 
+	public IOSGraphics init (float scale, IOSApplication app, IOSApplicationConfiguration config, IOSInput input, boolean useGLES30, IOSGLKView view) {
+		this.view = view;
+		return  init(scale, app, config, input, useGLES30);
+	}
+
 	public IOSGraphics init (float scale, IOSApplication app, IOSApplicationConfiguration config, IOSInput input, boolean useGLES30) {
 		init();
 		this.config = config;
@@ -119,7 +125,12 @@ public class IOSGraphics extends NSObject implements Graphics, GLKViewDelegate, 
 			gl30 = null;
 		}
 
-		view = IOSGLKView.alloc().init(this, new CGRect(new CGPoint(0, 0), new CGSize(bounds.size().width(), bounds.size().height())), context);
+		if (view == null) {
+			this.view = IOSGLKView.alloc().init(this, new CGRect(new CGPoint(0, 0), new CGSize(bounds.size().width(), bounds.size().height())), context);
+		} else {
+			view.setContext(context);
+			view.setGraphics(this);
+		}
 
 		view.setDelegate(this);
 		view.setDrawableColorFormat(config.colorFormat);
